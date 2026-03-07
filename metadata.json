@@ -1,0 +1,5 @@
+{
+  "name": "Generator RPM - Perencanaan Pembelajaran Mendalam",
+  "description": "A professional tool for Indonesian teachers to generate structured Deep Learning Plans (RPM) across all educational levels and subjects using Gemini AI.",
+  "requestFramePermissions": []
+}
