@@ -10,20 +10,21 @@
 ## 🌟 Tentang Proyek
 **Generator RPM** adalah aplikasi web modern yang dirancang khusus untuk membantu guru profesional di Indonesia menyusun Rencana Pembelajaran Mendalam (RPM) secara otomatis dan berkualitas tinggi. Menggunakan integrasi **OpenRouter API**, aplikasi ini mendukung berbagai model bahasa besar (LLM) seperti Gemini 2.0 Flash, Claude 3.5 Sonnet, dan GPT-4o.
 
-Aplikasi ini tidak hanya membuat rencana pembelajaran, tetapi juga menyediakan ekosistem administrasi lengkap mulai dari Capaian Pembelajaran (CP) hingga instrumen asesmen yang mendalam.
+Aplikasi ini tidak hanya membuat rencana pembelajaran, tetapi juga menyediakan ekosistem administrasi lengkap mulai dari Capaian Pembelajaran (CP) hingga instrumen asesmen yang mendalam dengan kendali penuh di tangan guru.
 
 ## ✨ Fitur Utama
-- **⚡ AI Live Streaming:** Lihat proses berpikir AI secara real-time melalui konsol output yang transparan.
-- **📚 Kurikulum Merdeka Ready:** Mendukung pembuatan CP dan TP yang selaras dengan standar nasional.
+- **⚡ AI Live Streaming (Global):** Pantau proses berpikir AI secara real-time di setiap tahapan melalui konsol output transparan.
+- **📝 Interactive Edit Mode:** Kendali penuh (*Human-in-the-loop*) untuk mengubah, memperbaiki, atau menambah narasi hasil AI langsung di tabel sebelum dicetak.
+- **📚 Kurikulum Merdeka Ready:** Pembuatan CP dan TP mandiri yang selaras dengan standar nasional.
+- **🎨 Rich Markdown Support:** Render otomatis untuk format tebal, miring, **link interaktif**, hingga **blok kode** (terminal style).
 - **🛠️ Administrasi Lengkap:**
-  - **Generate RPM:** Rencana pembelajaran detail per pertemuan.
+  - **Generate RPM:** Rencana pembelajaran detail per pertemuan sesuai pesanan.
   - **Generate LKPD:** Lembar Kerja Murid yang interaktif.
   - **Generate Rubrik:** Kriteria penilaian yang objektif.
   - **Jurnal Guru:** Refleksi proses mengajar secara sistematis.
   - **Asesmen:** Contoh soal diagnostik, formatif, dan sumatif.
-- **🤖 Multi-Model AI:** Mendukung model apapun yang tersedia di OpenRouter.
-- **📄 Ekspor Profesional:** Cetak langsung atau ekspor ke format **Microsoft Word (.docx)**.
-- **⚙️ Pengaturan Fleksibel:** Simpan API Key dan pilihan model secara aman di LocalStorage browser.
+- **🤖 Multi-Model AI:** Pilih model favorit Anda (Gemini, Claude, GPT, DeepSeek) atau masukkan ID model kustom secara manual.
+- **📄 Ekspor & Cetak Profesional:** Optimasi cetak warna (*background-aware*) dan ekspor ke format **Microsoft Word (.docx)**.
 
 ## 📸 Cuplikan Layar
 <div align="center">
