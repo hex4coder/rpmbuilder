@@ -25,6 +25,18 @@ Aplikasi ini tidak hanya membuat rencana pembelajaran, tetapi juga menyediakan e
 - **📄 Ekspor Profesional:** Cetak langsung atau ekspor ke format **Microsoft Word (.docx)**.
 - **⚙️ Pengaturan Fleksibel:** Simpan API Key dan pilihan model secara aman di LocalStorage browser.
 
+## 📸 Cuplikan Layar
+<div align="center">
+  <img src="screenshots/dms-screenshot-1772888959217.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772888966534.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772888979426.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772889140903.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772889156097.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772889172116.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772889232856.png" width="400" />
+  <img src="screenshots/dms-screenshot-1772889253260.png" width="400" />
+</div>
+
 ## 🛠️ Teknologi yang Digunakan
 - **Frontend:** [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
