@@ -723,7 +723,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <RPMTable data={formData} generated={generatedRPM} />
+            <RPMTable 
+              data={formData} 
+              generated={generatedRPM} 
+              onUpdate={(updated) => setGeneratedRPM(updated)} 
+            />
             
             <div className="mt-8 text-center text-slate-500 text-sm no-print mb-10">
               <p>Dibuat otomatis dengan AI Ardan • {new Date().getFullYear()}</p>
