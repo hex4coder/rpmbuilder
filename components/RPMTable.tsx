@@ -297,8 +297,11 @@ export const RPMTable: React.FC<RPMTableProps> = ({ data, generated, onUpdate })
                   Lampiran {index + 1}: {lampiran.label}
                 </div>
                 <div className="text-xs border-2 border-gray-200 dark:border-slate-700 p-6 rounded-xl bg-white dark:bg-slate-900/50 shadow-inner">
-                  <EditableCell value={content} isEditing={isEditing} onChange={(v) => handleFieldChange(lampiran.id as keyof GeneratedRPM, v)} rich={!isEditing} />
-                  {!isEditing && renderMarkdown(content)}
+                  {isEditing ? (
+                    <EditableCell value={content} isEditing={isEditing} onChange={(v) => handleFieldChange(lampiran.id as keyof GeneratedRPM, v)} rich={!isEditing} />
+                  ) : (
+                    renderMarkdown(content)
+                  )}
                 </div>
               </div>
             );

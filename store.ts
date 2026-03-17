@@ -28,6 +28,7 @@ interface RPMStore {
   addLog: (entry: LogEntry) => void;
   clearLogs: () => void;
   resetForm: () => void;
+  resetAttachments: () => void;
   toggleTheme: () => void;
 }
 
@@ -100,6 +101,15 @@ export const useRPMStore = create<RPMStore>()(
         step: 1,
         logs: []
       }),
+      resetAttachments: () => set((state) => ({
+        generatedRPM: state.generatedRPM ? {
+          ...state.generatedRPM,
+          rubrik: undefined,
+          lkpd: undefined,
+          jurnal: undefined,
+          instrumenAsesmen: undefined
+        } : null
+      })),
       toggleTheme: () => set((state) => ({ 
         theme: state.theme === 'light' ? 'dark' : 'light' 
       })),

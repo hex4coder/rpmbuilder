@@ -8,6 +8,7 @@ import { generateRPMContent, generateCP, generateTP, generateAttachment, testAIC
 import { exportToWord } from './services/wordExportService';
 import { RPMTable } from './components/RPMTable';
 import { useRPMStore } from './store';
+import Swal from 'sweetalert2';
 import { 
   FileText, 
   Loader2, 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
     settings, setSettings,
     logs, addLog, clearLogs,
     resetForm,
+    resetAttachments,
     theme, toggleTheme
   } = useRPMStore();
 
@@ -118,12 +120,22 @@ const App: React.FC = () => {
 
   const handleSuggestCP = async () => {
     if (!formData.mataPelajaran || !formData.materi) {
-      alert("Harap isi Mata Pelajaran dan Materi Pokok terlebih dahulu.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Form Belum Lengkap',
+        text: 'Harap isi Mata Pelajaran dan Materi Pokok terlebih dahulu.',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     if (!settings.apiKey) {
       setShowSettings(true);
-      alert("Harap masukkan OpenRouter API Key di menu Pengaturan.");
+      Swal.fire({
+        icon: 'info',
+        title: 'API Key Diperlukan',
+        text: 'Harap masukkan OpenRouter API Key di menu Pengaturan.',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     setIsSuggestingCP(true);
@@ -142,12 +154,22 @@ const App: React.FC = () => {
 
   const handleSuggestTP = async () => {
     if (!formData.mataPelajaran || !formData.materi) {
-      alert("Harap isi Mata Pelajaran dan Materi Pokok terlebih dahulu.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Form Belum Lengkap',
+        text: 'Harap isi Mata Pelajaran dan Materi Pokok terlebih dahulu.',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     if (!settings.apiKey) {
       setShowSettings(true);
-      alert("Harap masukkan OpenRouter API Key di menu Pengaturan.");
+      Swal.fire({
+        icon: 'info',
+        title: 'API Key Diperlukan',
+        text: 'Harap masukkan OpenRouter API Key di menu Pengaturan.',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     setIsSuggestingTP(true);
@@ -167,7 +189,12 @@ const App: React.FC = () => {
   const handleGenerate = async () => {
     if (!settings.apiKey) {
       setShowSettings(true);
-      alert("Harap masukkan OpenRouter API Key di menu Pengaturan.");
+      Swal.fire({
+        icon: 'info',
+        title: 'API Key Diperlukan',
+        text: 'Harap masukkan OpenRouter API Key di menu Pengaturan.',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
     setIsGenerating(true);
@@ -202,7 +229,12 @@ const App: React.FC = () => {
       const content = await generateAttachment(type, formData, generatedRPM, settings, addLog, handleStream);
       updateGeneratedRPM({ [type]: content });
     } catch (err) {
-      alert(`Gagal generate ${type}`);
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Generate',
+        text: `Gagal generate ${type}`,
+        confirmButtonColor: '#3b82f6'
+      });
     } finally {
       setters[type](false);
     }
@@ -215,7 +247,12 @@ const App: React.FC = () => {
       await exportToWord(formData, generatedRPM);
     } catch (err) {
       console.error(err);
-      alert("Gagal mengekspor file Word.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Ekspor Gagal',
+        text: 'Gagal mengekspor file Word.',
+        confirmButtonColor: '#3b82f6'
+      });
     } finally {
       setIsExporting(false);
     }
@@ -226,9 +263,31 @@ const App: React.FC = () => {
   };
 
   const handleReset = () => {
-    if (confirm("Apakah Anda yakin ingin menghapus semua data dan memulai dari awal?")) {
-      resetForm();
-    }
+    Swal.fire({
+      title: 'Reset Form?',
+      text: "Apakah Anda yakin ingin menghapus semua data dan memulai dari awal?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Reset!',
+      cancelButtonText: 'Batal',
+      background: theme === 'dark' ? '#0f172a' : '#ffffff',
+      color: theme === 'dark' ? '#f1f5f9' : '#1e293b'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        resetForm();
+        Swal.fire({
+          title: 'Direset!',
+          text: 'Data telah dikosongkan.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          background: theme === 'dark' ? '#0f172a' : '#ffffff',
+          color: theme === 'dark' ? '#f1f5f9' : '#1e293b'
+        });
+      }
+    });
   };
 
   const handleTestConnection = async () => {
@@ -668,6 +727,42 @@ const App: React.FC = () => {
                     {type === 'instrumenAsesmen' ? 'Asesmen' : type.toUpperCase()}
                   </button>
                 ))}
+
+                {(generatedRPM.rubrik || generatedRPM.lkpd || generatedRPM.jurnal || generatedRPM.instrumenAsesmen) && (
+                  <button 
+                    onClick={() => { 
+                      Swal.fire({
+                        title: 'Reset Lampiran?',
+                        text: "Hapus semua lampiran yang telah dibuat?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal',
+                        background: theme === 'dark' ? '#0f172a' : '#ffffff',
+                        color: theme === 'dark' ? '#f1f5f9' : '#1e293b'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          resetAttachments();
+                          Swal.fire({
+                            title: 'Dihapus!',
+                            text: 'Semua lampiran telah dikosongkan.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            background: theme === 'dark' ? '#0f172a' : '#ffffff',
+                            color: theme === 'dark' ? '#f1f5f9' : '#1e293b'
+                          });
+                        }
+                      });
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all border border-red-200 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20"
+                    title="Hapus semua lampiran"
+                  >
+                    <RotateCcw className="w-4 h-4" /> Reset
+                  </button>
+                )}
               </div>
 
               <div className="flex gap-2">
