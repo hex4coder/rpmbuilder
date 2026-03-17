@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 export type Jenjang = 'SD' | 'SMP' | 'SMA' | 'SMK';
 
@@ -46,28 +47,30 @@ export interface RPMFormData {
   dimensiLulusan: string[];
 }
 
-export interface GeneratedRPM {
-  siswa: string;
-  lintasDisiplin: string;
-  topik: string;
-  pertanyaanPemantik: string;
-  pengalamanBelajar: {
-    pertemuan: number;
-    pendahuluan: string;
-    inti: string;
-    penutup: string;
-  }[];
-  asesmen: {
-    diagnostik: string;
-    formatif: string;
-    sumatif: string;
-  };
-  // Lampiran
-  rubrik?: string;
-  lkpd?: string;
-  jurnal?: string;
-  instrumenAsesmen?: string;
-}
+// Zod Schema for Validation
+export const GeneratedRPMSchema = z.object({
+  siswa: z.string(),
+  lintasDisiplin: z.string(),
+  topik: z.string(),
+  pertanyaanPemantik: z.string(),
+  pengalamanBelajar: z.array(z.object({
+    pertemuan: z.number(),
+    pendahuluan: z.string(),
+    inti: z.string(),
+    penutup: z.string()
+  })),
+  asesmen: z.object({
+    diagnostik: z.string(),
+    formatif: z.string(),
+    sumatif: z.string()
+  }),
+  rubrik: z.string().optional(),
+  lkpd: z.string().optional(),
+  jurnal: z.string().optional(),
+  instrumenAsesmen: z.string().optional()
+});
+
+export type GeneratedRPM = z.infer<typeof GeneratedRPMSchema>;
 
 export interface AppSettings {
   apiKey: string;

@@ -1,6 +1,5 @@
-
 import OpenAI from "openai";
-import { RPMFormData, GeneratedRPM, AppSettings, LogEntry } from "../types";
+import { RPMFormData, GeneratedRPM, AppSettings, LogEntry, GeneratedRPMSchema } from "../types";
 import { SYSTEM_PROMPT } from "../constants";
 
 const getTimestamp = () => new Date().toLocaleTimeString('id-ID', { hour12: false });
@@ -26,33 +25,46 @@ export async function generateRPMContent(
   const openai = getClient(settings);
   onLog?.({ timestamp: getTimestamp(), message: `Menghubungi OpenRouter (${settings.model})...`, type: 'info' });
 
+  // Logika Spesifik Jenjang (Fitur 4)
+  const jenjangContext = formData.jenjang === 'SMK' 
+    ? `Fokus pada Link & Match industri, praktik kejuruan, dan kesiapan kerja di bidang ${formData.programKeahlian}.`
+    : formData.jenjang === 'SD'
+    ? "Gunakan pendekatan konkret, bermain sambil belajar, dan bahasa yang sangat sederhana."
+    : "Gunakan pendekatan eksplorasi konsep dan penguatan profil pelajar pancasila.";
+
   const prompt = `
-    Hasilkan konten RPM (Rencana Pembelajaran Mendalam) dalam format JSON sesuai spesifikasi berikut:
+    Hasilkan konten RPM (Rencana Pembelajaran Mendalam) yang selaras dengan standar PMM (Platform Merdeka Mengajar) dalam format JSON.
     
     Data Konteks:
     Sekolah: ${formData.satuanPendidikan}
     Jenjang/Kelas: ${formData.jenjang} / ${formData.kelas}
-    ${formData.jenjang === 'SMK' ? `Program Keahlian: ${formData.programKeahlian}` : ''}
     Mata Pelajaran: ${formData.mataPelajaran}
     Materi: ${formData.materi}
     Capaian Pembelajaran (CP): ${formData.cp}
     Tujuan Pembelajaran (TP): ${formData.tp}
     
-    BATASAN JUMLAH PERTEMUAN (SANGAT PENTING):
-    JUMLAH PERTEMUAN HARUS TEPAT: ${formData.jumlahPertemuan} PERTEMUAN.
-    Durasi Total: ${formData.durasi}
+    KONTEKS PEDAGOGIS:
+    ${jenjangContext}
     
+    INSTRUKSI DIFERENSIASI (FITUR UNGGULAN):
+    Dalam bagian "inti" setiap pertemuan, WAJIB sertakan saran strategi DIFERENSIASI untuk Murid dengan:
+    1. Kesiapan Belajar Rendah (butuh bimbingan lebih).
+    2. Kesiapan Belajar Sedang.
+    3. Kesiapan Belajar Tinggi (tantangan pengayaan).
+    Gunakan istilah "Diferensiasi:" di dalam teks narasi.
+
+    BATASAN JUMLAH PERTEMUAN: ${formData.jumlahPertemuan} PERTEMUAN.
     MODEL PEMBELAJARAN PER PERTEMUAN:
     ${formData.pedagogiPerPertemuan.map(p => `- Pertemuan ${p.meetingNumber}: ${p.pedagogy}`).join('\n')}
     
-    DIMENSI PROFIL LULUSAN:
-    ${formData.dimensiLulusan.join(', ')}
+    DIMENSI PROFIL LULUSAN: ${formData.dimensiLulusan.join(', ')}
 
-    INSTRUKSI OUTPUT:
-    1. Properti "pengalamanBelajar" HARUS berisi ARRAY dengan TEPAT ${formData.jumlahPertemuan} OBJEK.
-    2. Setiap objek dalam "pengalamanBelajar" harus memiliki detail Aktivitas Murid (Pendahuluan, Inti, Penutup) sesuai Model Pembelajaran yang diminta di atas.
-    3. Gunakan kata 'Murid' untuk merujuk pada peserta didik.
-    4. Output HARUS JSON MURNI.
+    INSTRUKSI OUTPUT JSON:
+    1. "siswa": Karakteristik murid secara umum.
+    2. "lintasDisiplin": Hubungan materi ini dengan mapel lain (PMM Style).
+    3. "pertanyaanPemantik": Pertanyaan yang memicu rasa ingin tahu (PMM Style).
+    4. "pengalamanBelajar": Array dengan ${formData.jumlahPertemuan} objek.
+    5. Gunakan kata 'Murid' (bukan siswa). Output HARUS JSON MURNI.
   `;
 
   try {
@@ -73,8 +85,18 @@ export async function generateRPMContent(
       if (onStream) onStream(content);
     }
     
-    onLog?.({ timestamp: getTimestamp(), message: "Data diterima, memvalidasi sinkronisasi pertemuan...", type: 'info' });
-    const parsed = JSON.parse(fullContent) as GeneratedRPM;
+    onLog?.({ timestamp: getTimestamp(), message: "Data diterima, memvalidasi skema data...", type: 'info' });
+    const rawData = JSON.parse(fullContent);
+    
+    // Validasi dengan Zod
+    const validation = GeneratedRPMSchema.safeParse(rawData);
+    if (!validation.success) {
+      console.error("Zod Validation Errors:", validation.error.errors);
+      onLog?.({ timestamp: getTimestamp(), message: "Peringatan: Struktur data AI tidak sesuai standar, mencoba melakukan koreksi...", type: 'warning' });
+      return rawData as GeneratedRPM; // Fallback jika gagal validasi ketat
+    }
+
+    const parsed = validation.data;
     
     if (parsed.pengalamanBelajar.length !== formData.jumlahPertemuan) {
       onLog?.({ timestamp: getTimestamp(), message: `Peringatan: AI menghasilkan ${parsed.pengalamanBelajar.length} pertemuan, seharusnya ${formData.jumlahPertemuan}.`, type: 'warning' });
@@ -203,5 +225,24 @@ export async function generateTP(
     const errorDetail = error.response?.data?.error?.message || error.message || "Unknown Error";
     onLog?.({ timestamp: getTimestamp(), message: `ERROR: ${errorDetail}`, type: 'error' });
     throw new Error(errorDetail);
+  }
+}
+
+export async function testAIConnection(settings: AppSettings): Promise<boolean> {
+  const openai = getClient(settings);
+  try {
+    const stream = await openai.chat.completions.create({
+      model: settings.model || 'google/gemini-2.0-flash-001',
+      messages: [{ role: "user", content: "Respond with just the word 'OK'." }],
+      max_tokens: 2,
+      stream: true,
+    });
+    for await (const chunk of stream) {
+      // drain the stream
+    }
+    return true;
+  } catch (error) {
+    console.error("AI Connection Test Failed:", error);
+    return false;
   }
 }
